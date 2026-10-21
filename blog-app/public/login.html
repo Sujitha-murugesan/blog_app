@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BlogApp - Login</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <nav id="nav"></nav>
+  <main>
+    <div class="card">
+      <h1>Login</h1>
+      <form id="form">
+        <label for="email">Email</label>
+        <input id="email" type="email" required />
+        <label for="password">Password</label>
+        <input id="password" type="password" required />
+        <button class="btn" type="submit">Login</button>
+        <div id="msg" class="msg"></div>
+      </form>
+      <p class="hint">New here? <a href="/register.html">Create an account</a></p>
+    </div>
+  </main>
+  <script src="/js/api.js"></script>
+  <script>
+    document.getElementById('form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById('msg');
+      const btn = e.target.querySelector('button');
+      btn.disabled = true;
+      try {
+        const data = await api('/auth/login', {
+          method: 'POST',
+          body: {
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value,
+          },
+        });
+        Auth.save(data.token, data.user);
+        showMsg(msg, 'Logged in! Redirecting…', 'success');
+        setTimeout(() => (window.location.href = '/'), 600);
+      } catch (err) {
+        showMsg(msg, err.message, 'error');
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

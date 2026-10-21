@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BlogApp - Create Blog</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <nav id="nav"></nav>
+  <main>
+    <div class="card">
+      <h1>Write a new blog</h1>
+      <form id="form">
+        <label for="title">Title</label>
+        <input id="title" type="text" maxlength="150" required />
+        <label for="content">Content</label>
+        <textarea id="content" required></textarea>
+        <button class="btn" type="submit">Publish</button>
+        <div id="msg" class="msg"></div>
+      </form>
+    </div>
+  </main>
+  <script src="/js/api.js"></script>
+  <script>
+    // Protected page: must be logged in
+    if (!Auth.loggedIn) window.location.href = '/login.html';
+
+    document.getElementById('form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById('msg');
+      const btn = e.target.querySelector('button');
+      btn.disabled = true;
+      try {
+        await api('/blogs', {
+          method: 'POST',
+          auth: true,
+          body: {
+            title: document.getElementById('title').value,
+            content: document.getElementById('content').value,
+          },
+        });
+        showMsg(msg, 'Blog published! Redirecting…', 'success');
+        setTimeout(() => (window.location.href = '/'), 800);
+      } catch (err) {
+        showMsg(msg, err.message, 'error');
+        btn.disabled = false;
+        if (!Auth.loggedIn) setTimeout(() => (window.location.href = '/login.html'), 1200);
+      }
+    });
+  </script>
+</body>
+</html>
